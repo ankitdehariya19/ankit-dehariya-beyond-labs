@@ -1,53 +1,60 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const Page = () => {
-  const [users, setUsers] = useState([
+  const users = [
     { id: 1, name: "Rahul", status: "active" },
     { id: 2, name: "Anita", status: "inactive" },
     { id: 3, name: "Vikram", status: "active" },
     { id: 4, name: "Sneha", status: "inactive" },
     { id: 5, name: "Aman", status: "active" },
-  ]);
+  ];
 
-  const [name, setName] = useState();
-  const [filterUser, setFilterUser] = useState();
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
 
-  useEffect(() => {
-    const filterData = users.filter((user, index) => {
-      if (user?.name?.toLocaleLowerCase().includes(name?.toLocaleLowerCase()))
-        return user;
-    });
+  const filteredUsers = users.filter((user) => {
+    const matchName = user.name.toLowerCase().includes(search.toLowerCase());
 
-    if (filterData.length >= 0) {
-      setUsers(users);
-    } else {
-      setUsers(filterData);
-    }
-  }, [name]);
+    const matchStatus = status === "all" || user.status === status;
+
+    return matchName && matchStatus;
+  });
 
   return (
-    <div className="w-full h-full  ">
+    <div className="w-full h-full p-4">
       <input
         type="text"
-        id="name"
-        name={name}
-        onChange={(e) => setName(e.target.value)}
-        className="border-0 outline-1"
+        placeholder="Search by name..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="border p-2 mb-4 w-full max-w-md"
       />
-      {users ? (
-        <div>
-          {users?.map((item, index) => {
-            return (
-              <div className="flex flex-row justify-between items-center max-w-md">
-                <div className=" text-white font-semibold">{item.name} </div>
-                <div className=" text-white font-semibold">{item.status} </div>
-              </div>
-            );
-          })}
+
+      <select
+        value={status}
+        onChange={(e) => setStatus(e.target.value)}
+        className="border p-2 mb-4 ml-2"
+      >
+        <option value="all">All</option>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+
+      {filteredUsers.length > 0 ? (
+        <div className="space-y-2">
+          {filteredUsers.map((user) => (
+            <div
+              key={user.id}
+              className="flex justify-between items-center max-w-md border p-2"
+            >
+              <div className="font-semibold">{user.name}</div>
+              <div className="text-sm text-gray-600">{user.status}</div>
+            </div>
+          ))}
         </div>
       ) : (
-        "not found"
+        <div className="text-red-500 font-medium">No results found</div>
       )}
     </div>
   );
